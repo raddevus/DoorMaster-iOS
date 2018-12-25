@@ -20,6 +20,7 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     
     let userDefs = UserDefaults.standard
     var BTDevices : [String] = [String]()
+    var currentBTDevice : String!
     
     @IBOutlet weak var BTPicker: UIPickerView!
     override func viewDidLoad() {
@@ -30,6 +31,11 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
         self.BTPicker.dataSource = self
         
         BTDevices = ["Item 1", "Item 2", "Item 3", "Item 4", "Item 5", "Item 6"]
+        
+        currentBTDevice = userDefs.string(forKey:"btdevice")
+        if (currentBTDevice != nil){
+            print (currentBTDevice)
+        }
     }
     
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
@@ -37,8 +43,10 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     }
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        //userDefs.string(forKey: "btDevice")
-        var x = 5
+        userDefs.set(BTDevices[row], forKey:"btdevice")
+        userDefs.synchronize()
+        print(BTDevices[row])
+        
     }
 
 
