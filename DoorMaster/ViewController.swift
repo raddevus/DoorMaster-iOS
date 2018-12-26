@@ -24,7 +24,14 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
             self.centralManager?.scanForPeripherals(withServices: nil, options: nil)
         }
         else {
-            // do something like alert the user that ble is not on
+            let alertVC = UIAlertController(title: "Bluetooth is not enabled", message: "Make sure that your bluetooth is turned on", preferredStyle: UIAlertController.Style.alert)
+            let action = UIAlertAction(title: "ok", style: UIAlertAction.Style.default, handler: { (action: UIAlertAction) -> Void in
+                self.dismiss(animated: true, completion: nil)
+            })
+            alertVC.addAction(action)
+            self.present(alertVC, animated: true, completion: nil)
+            BTDevices.append("-- Devices display here --")
+            BTPicker.reloadAllComponents()
         }
     }
     
@@ -35,8 +42,25 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
         else{
             BTDevices.append("no device name")
         }
-        BTPicker.reloadAllComponents()
-        // tableView.reloadData()
+        
+    }
+    
+    @IBAction func ScanForBluetooth(sender: UIButton){
+        if (centralManager?.state == .poweredOn){
+            self.centralManager?.scanForPeripherals(withServices: nil, options: nil)
+        }
+        else {
+            let alertVC = UIAlertController(title: "Bluetooth is not enabled", message: "Make sure that your bluetooth is turned on", preferredStyle: UIAlertController.Style.alert)
+            let action = UIAlertAction(title: "ok", style: UIAlertAction.Style.default, handler: { (action: UIAlertAction) -> Void in
+                self.dismiss(animated: true, completion: nil)
+            })
+            alertVC.addAction(action)
+            self.present(alertVC, animated: true, completion: nil)
+            BTDevices.removeAll()
+            BTDevices.append("-- Devices display here --")
+            BTPicker.reloadAllComponents()
+        }
+        
     }
 
     
@@ -51,21 +75,22 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     
         override func viewDidLoad() {
         super.viewDidLoad()
-        
+        // viewDidLoad() runs BEFORE CentralManager initialization
         //Initialise CoreBluetooth Central Manager
         centralManager = CBCentralManager(delegate: self, queue: DispatchQueue.main)
         
         // Connect data:
         self.BTPicker.delegate = self
         self.BTPicker.dataSource = self
-        
+        BTPicker.reloadAllComponents()
         //BTDevices = ["Item 1", "Item 2", "Item 3", "Item 4", "Item 5", "Item 6"]
         //userDefs.removeObject(forKey: "btdevice")  // use to remove value you added
         currentBTDevice = userDefs.string(forKey:"btdevice")
         if (currentBTDevice != nil){
             print (currentBTDevice)
         }
-        var itemIndex = getUserSavedBTDevice();
+            
+        let itemIndex = getUserSavedBTDevice();
         
         BTPicker.selectRow(itemIndex, inComponent: 0, animated: true)
     }
