@@ -31,15 +31,29 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
         self.BTPicker.dataSource = self
         
         BTDevices = ["Item 1", "Item 2", "Item 3", "Item 4", "Item 5", "Item 6"]
-        
+        //userDefs.removeObject(forKey: "btdevice")  // use to remove value you added
         currentBTDevice = userDefs.string(forKey:"btdevice")
         if (currentBTDevice != nil){
             print (currentBTDevice)
         }
+        var itemIndex = getUserSavedBTDevice();
+        
+        BTPicker.selectRow(itemIndex, inComponent: 0, animated: true)
     }
     
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
             return BTDevices[row]
+    }
+    
+    func getUserSavedBTDevice() -> Int{
+        for (index, item) in BTDevices.enumerated(){
+            if (item == currentBTDevice){
+                return index
+            }
+        }
+        // if the item isn't found we just return 0
+        // so the first item in uipickerview is selected.
+        return 0;
     }
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
