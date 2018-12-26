@@ -20,6 +20,7 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     @IBOutlet weak var BTPicker: UIPickerView!
 
     func centralManagerDidUpdateState(_ central: CBCentralManager) {
+        BTDevices.removeAll()
         if (central.state == .poweredOn){
             self.centralManager?.scanForPeripherals(withServices: nil, options: nil)
         }
@@ -42,10 +43,14 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
         else{
             BTDevices.append("no device name")
         }
+        BTPicker.reloadAllComponents()
+        setUserBtDevice()
         
     }
     
     @IBAction func ScanForBluetooth(sender: UIButton){
+        BTDevices.removeAll()
+
         if (centralManager?.state == .poweredOn){
             self.centralManager?.scanForPeripherals(withServices: nil, options: nil)
         }
@@ -90,14 +95,17 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
             print (currentBTDevice)
         }
             
-        let itemIndex = getUserSavedBTDevice();
-        
-        BTPicker.selectRow(itemIndex, inComponent: 0, animated: true)
+        setUserBtDevice()
     }
     
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
             return BTDevices[row]
     }
+    
+    func setUserBtDevice(){
+        let itemIndex = getUserSavedBTDevice();
+        
+        BTPicker.selectRow(itemIndex, inComponent: 0, animated: true)    }
     
     func getUserSavedBTDevice() -> Int{
         for (index, item) in BTDevices.enumerated(){
