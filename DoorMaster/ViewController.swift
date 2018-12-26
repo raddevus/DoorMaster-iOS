@@ -7,8 +7,39 @@
 //
 
 import UIKit
+import CoreBluetooth
 
-class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSource {
+class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSource,CBCentralManagerDelegate {
+    
+    let userDefs = UserDefaults.standard
+    var BTDevices : [String] = [String]()
+    var currentBTDevice : String!
+    var centralManager : CBCentralManager?
+    var peripherals = Array<CBPeripheral>()
+    
+    @IBOutlet weak var BTPicker: UIPickerView!
+
+    func centralManagerDidUpdateState(_ central: CBCentralManager) {
+        if (central.state == .poweredOn){
+            self.centralManager?.scanForPeripherals(withServices: nil, options: nil)
+        }
+        else {
+            // do something like alert the user that ble is not on
+        }
+    }
+    
+    func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
+        if (peripheral.name != nil){
+            BTDevices.append(peripheral.name!)
+        }
+        else{
+            BTDevices.append("no device name")
+        }
+        BTPicker.reloadAllComponents()
+        // tableView.reloadData()
+    }
+
+    
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
         return 1
         
@@ -18,19 +49,17 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
         return BTDevices.count
     }
     
-    let userDefs = UserDefaults.standard
-    var BTDevices : [String] = [String]()
-    var currentBTDevice : String!
-    
-    @IBOutlet weak var BTPicker: UIPickerView!
-    override func viewDidLoad() {
+        override func viewDidLoad() {
         super.viewDidLoad()
+        
+        //Initialise CoreBluetooth Central Manager
+        centralManager = CBCentralManager(delegate: self, queue: DispatchQueue.main)
         
         // Connect data:
         self.BTPicker.delegate = self
         self.BTPicker.dataSource = self
         
-        BTDevices = ["Item 1", "Item 2", "Item 3", "Item 4", "Item 5", "Item 6"]
+        //BTDevices = ["Item 1", "Item 2", "Item 3", "Item 4", "Item 5", "Item 6"]
         //userDefs.removeObject(forKey: "btdevice")  // use to remove value you added
         currentBTDevice = userDefs.string(forKey:"btdevice")
         if (currentBTDevice != nil){
