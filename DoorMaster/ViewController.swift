@@ -9,17 +9,26 @@
 import UIKit
 import CoreBluetooth
 
-class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSource,CBCentralManagerDelegate {
+class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSource,CBCentralManagerDelegate, CBPeripheralDelegate,
+CBPeripheralManagerDelegate
+{
+    func peripheralManagerDidUpdateState(_ peripheral: CBPeripheralManager) {
+        
+    }
+    
     
     let userDefs = UserDefaults.standard
     var BTDevices : [String] = [String]()
     var currentBTDevice : String!
     var centralManager : CBCentralManager?
     var peripherals = Array<CBPeripheral>()
+    var data : NSMutableData = NSMutableData()
+    var currentPeripheral : CBPeripheral!
     
     @IBOutlet weak var BTPicker: UIPickerView!
 
     func centralManagerDidUpdateState(_ central: CBCentralManager) {
+        peripherals.removeAll()
         BTDevices.removeAll()
         if (central.state == .poweredOn){
             self.centralManager?.scanForPeripherals(withServices: nil, options: nil)
@@ -39,10 +48,12 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
         if (peripheral.name != nil){
             BTDevices.append(peripheral.name!)
+            
         }
         else{
             BTDevices.append("no device name")
         }
+        peripherals.append(peripheral)
         BTPicker.reloadAllComponents()
         setUserBtDevice()
         
@@ -50,7 +61,7 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     
     @IBAction func ScanForBluetooth(sender: UIButton){
         BTDevices.removeAll()
-
+        peripherals.removeAll()
         if (centralManager?.state == .poweredOn){
             self.centralManager?.scanForPeripherals(withServices: nil, options: nil)
         }
@@ -61,13 +72,61 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
             })
             alertVC.addAction(action)
             self.present(alertVC, animated: true, completion: nil)
-            BTDevices.removeAll()
             BTDevices.append("-- Devices display here --")
             BTPicker.reloadAllComponents()
         }
         
     }
-
+    
+    @IBAction func OpenCloseDoor(sender: UIButton){
+        // This function sends data over bluetooth to the connected .
+        currentPeripheral = peripherals[BTPicker.selectedRow(inComponent: 0)]
+        centralManager?.connect(currentPeripheral, options: nil)
+    }
+    
+    func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
+        print("*****************************")
+        print("Connection complete")
+        print("Peripheral info: \(currentPeripheral)")
+        
+        //Stop Scan- We don't need to scan once we've connected to a peripheral. We got what we came for.
+        centralManager?.stopScan()
+        print("Scan Stopped")
+        
+        //Erase data that we might have
+        data.length = 0
+        
+        //Discovery callback
+        peripheral.delegate = self
+        //Only look for services that matches transmit uuid
+        peripheral.discoverServices(nil)
+    }
+    
+    func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
+        print("*******************************************************")
+        
+        if ((error) != nil) {
+            print("Error discovering services: \(error!.localizedDescription)")
+            return
+        }
+        
+        guard let services = peripheral.services else {
+            return
+        }
+        //We need to discover the all characteristic
+        for service in services {
+            
+            peripheral.discoverCharacteristics(nil, for: service)
+        }
+        print("Discovered Services: \(services)")
+        disconnectFromDevice(peripheral)
+    }
+    
+    func disconnectFromDevice (_ peripheral: CBPeripheral ) {
+        if peripheral != nil {
+            centralManager?.cancelPeripheralConnection(peripheral)
+        }
+    }
     
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
         return 1
@@ -105,7 +164,9 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     func setUserBtDevice(){
         let itemIndex = getUserSavedBTDevice();
         
-        BTPicker.selectRow(itemIndex, inComponent: 0, animated: true)    }
+        BTPicker.selectRow(itemIndex, inComponent: 0, animated: true)
+        
+    }
     
     func getUserSavedBTDevice() -> Int{
         for (index, item) in BTDevices.enumerated(){
