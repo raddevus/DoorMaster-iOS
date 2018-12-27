@@ -163,6 +163,10 @@ CBPeripheralManagerDelegate
         else{
             // navigationController?.popToRootViewController(animated: true)
         }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
+            self.disconnectFromDevice(peripheral)
+        })
+        
     }
 
     func disconnectFromDevice (_ peripheral: CBPeripheral ) {
