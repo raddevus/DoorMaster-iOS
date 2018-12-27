@@ -48,7 +48,6 @@ CBPeripheralManagerDelegate
     func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
         if (peripheral.name != nil){
             BTDevices.append(peripheral.name!)
-            
         }
         else{
             BTDevices.append("no device name")
@@ -119,8 +118,7 @@ CBPeripheralManagerDelegate
             peripheral.discoverCharacteristics(nil, for: service)
         }
         print("Discovered Services: \(services)")
-        //writeValue(data:"test")
-        //disconnectFromDevice(peripheral)
+        
     }
     
     func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
@@ -174,17 +172,7 @@ CBPeripheralManagerDelegate
             centralManager?.cancelPeripheralConnection(peripheral)
         }
     }
-    
-    func writeValue(data: String){
-        /*let characteristic :String = "FFE!"
-        let valueString = (data as NSString).data(using: String.Encoding.utf8.rawValue)
-    
-        let outString = "yes\n"
-        let data = outString.data(using: String.Encoding.utf8)
-        currentPeripheral.writeValue(data, for: characteristic, type: CBCharacteristicWriteType.withoutResponse)
-     */
-    }
-    
+   
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
         return 1
         
@@ -197,14 +185,14 @@ CBPeripheralManagerDelegate
         override func viewDidLoad() {
         super.viewDidLoad()
         // viewDidLoad() runs BEFORE CentralManager initialization
-        //Initialise CoreBluetooth Central Manager
+        //Initialize CoreBluetooth Central Manager
         centralManager = CBCentralManager(delegate: self, queue: DispatchQueue.main)
         
         // Connect data:
         self.BTPicker.delegate = self
         self.BTPicker.dataSource = self
         BTPicker.reloadAllComponents()
-        //BTDevices = ["Item 1", "Item 2", "Item 3", "Item 4", "Item 5", "Item 6"]
+        
         //userDefs.removeObject(forKey: "btdevice")  // use to remove value you added
         currentBTDevice = userDefs.string(forKey:"btdevice")
         if (currentBTDevice != nil){
