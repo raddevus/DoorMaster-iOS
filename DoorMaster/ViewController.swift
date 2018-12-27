@@ -119,13 +119,66 @@ CBPeripheralManagerDelegate
             peripheral.discoverCharacteristics(nil, for: service)
         }
         print("Discovered Services: \(services)")
-        disconnectFromDevice(peripheral)
+        //writeValue(data:"test")
+        //disconnectFromDevice(peripheral)
     }
     
+    func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
+        
+        if let error = error {
+            print("Error discovering service characteristics: \(error.localizedDescription)")
+        }
+        
+        service.characteristics?.forEach({ characteristic in
+            if let descriptors = characteristic.descriptors {
+                print("DESCRIPTORS \(descriptors)")
+            }
+            let outString = "yes\n"
+            let data = outString.data(using: String.Encoding.utf8)
+            for characteristic in service.characteristics as [CBCharacteristic]!{
+                if(characteristic.uuid.uuidString == "FFE1")
+                {
+                    print("sending data")
+                    peripheral.writeValue(data ?? Data() ,
+                                          for: characteristic,
+                                          type: CBCharacteristicWriteType.withResponse)
+                }
+            }
+            print("CHARACTERISTIC : \(characteristic.uuid.uuidString)")
+            print(characteristic.properties)
+        })
+    }
+    
+    func peripheral(_ peripheral: CBPeripheral,
+                    didWriteValueFor characteristic: CBCharacteristic,
+                    error: Error?){
+        let outString = "other data\n"
+        let data = outString.data(using: String.Encoding.utf8)
+        if (error != nil){
+            print(error.debugDescription)
+            peripheral.writeValue(data ?? Data() ,
+                                  for: characteristic,
+                                  type: CBCharacteristicWriteType.withoutResponse)
+        }
+        else{
+            // navigationController?.popToRootViewController(animated: true)
+        }
+    }
+
     func disconnectFromDevice (_ peripheral: CBPeripheral ) {
         if peripheral != nil {
             centralManager?.cancelPeripheralConnection(peripheral)
         }
+    }
+    
+    func writeValue(data: String){
+        /*let characteristic :String = "FFE!"
+        let valueString = (data as NSString).data(using: String.Encoding.utf8.rawValue)
+    
+        let outString = "yes\n"
+        let data = outString.data(using: String.Encoding.utf8)
+        currentPeripheral.writeValue(data, for: characteristic, type: CBCharacteristicWriteType.withoutResponse)
+     */
     }
     
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
