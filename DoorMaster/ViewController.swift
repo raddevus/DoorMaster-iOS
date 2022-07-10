@@ -50,7 +50,8 @@ CBPeripheralManagerDelegate
             BTDevices.append(peripheral.name!)
         }
         else{
-            BTDevices.append("no device name")
+            // 2022-07-10 No longer show devices with no name
+            // BTDevices.append("no device name")
         }
         peripherals.append(peripheral)
         BTPicker.reloadAllComponents()
@@ -79,7 +80,11 @@ CBPeripheralManagerDelegate
     
     @IBAction func OpenCloseDoor(sender: UIButton){
         // This function sends data over bluetooth to the connected .
-        currentPeripheral = peripherals[BTPicker.selectedRow(inComponent: 0)]
+        let currentSelectedBT = BTPicker.selectedRow(inComponent: 0)
+        currentPeripheral = peripherals[currentSelectedBT]
+        if ((currentPeripheral.name?.contains("")) != nil){
+            
+        }
         centralManager?.connect(currentPeripheral, options: nil)
     }
     
@@ -131,20 +136,40 @@ CBPeripheralManagerDelegate
             if let descriptors = characteristic.descriptors {
                 print("DESCRIPTORS \(descriptors)")
             }
-            let outString = "yes\n"
-            let data = outString.data(using: String.Encoding.utf8)
-            for characteristic in service.characteristics as [CBCharacteristic]!{
+            let outString = "y"
+            var data = outString.data(using: String.Encoding.ascii)
+           
+            for characteristic in service.characteristics! as [CBCharacteristic]{
                 if(characteristic.uuid.uuidString == "FFE1")
                 {
+                    if (peripheral.state.rawValue == 2){
                     print("sending data")
                     peripheral.writeValue(data ?? Data() ,
                                           for: characteristic,
-                                          type: CBCharacteristicWriteType.withResponse)
+                                          type: CBCharacteristicWriteType.withoutResponse)
+                        let noString = "n"
+                        sleep(1)
+                        data = noString.data(using: String.Encoding.ascii)
+                        peripheral.writeValue(data ?? Data() ,
+                                              for: characteristic,
+                                              type: CBCharacteristicWriteType.withoutResponse)
+                        sleep(1)
+                        data = noString.data(using: String.Encoding.ascii)
+                        peripheral.writeValue(data ?? Data() ,
+                                              for: characteristic,
+                                              type: CBCharacteristicWriteType.withoutResponse)
+                        
+                    }
+                    
+                    
                 }
             }
             print("CHARACTERISTIC : \(characteristic.uuid.uuidString)")
             print(characteristic.properties)
+            
         })
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
+            self.disconnectFromDevice(peripheral)    })
     }
     
     func peripheral(_ peripheral: CBPeripheral,
@@ -196,7 +221,7 @@ CBPeripheralManagerDelegate
         //userDefs.removeObject(forKey: "btdevice")  // use to remove value you added
         currentBTDevice = userDefs.string(forKey:"btdevice")
         if (currentBTDevice != nil){
-            print (currentBTDevice)
+            print (currentBTDevice!)
         }
             
         setUserBtDevice()
