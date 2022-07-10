@@ -80,11 +80,18 @@ CBPeripheralManagerDelegate
     
     @IBAction func OpenCloseDoor(sender: UIButton){
         // This function sends data over bluetooth to the connected .
+
+        if (peripherals.count <= 0){
+            let alertVC = UIAlertController(title: "No BT Devices", message: "Couldn't connect.  Please try again.", preferredStyle: UIAlertController.Style.alert)
+            let action = UIAlertAction(title: "ok", style: UIAlertAction.Style.default, handler: { (action: UIAlertAction) -> Void in
+                self.dismiss(animated: true, completion: nil)
+            })
+            alertVC.addAction(action)
+            self.present(alertVC, animated: true, completion: nil)
+            return;
+        }
         let currentSelectedBT = BTPicker.selectedRow(inComponent: 0)
         currentPeripheral = peripherals[currentSelectedBT]
-        if ((currentPeripheral.name?.contains("")) != nil){
-            
-        }
         centralManager?.connect(currentPeripheral, options: nil)
     }
     
