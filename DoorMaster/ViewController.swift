@@ -25,6 +25,8 @@ CBPeripheralManagerDelegate
     var data : NSMutableData = NSMutableData()
     var currentPeripheral : CBPeripheral!
     
+    @IBOutlet var textDiagnostics : UITextView!
+    
     @IBOutlet weak var BTPicker: UIPickerView!
 
     func centralManagerDidUpdateState(_ central: CBCentralManager) {
@@ -43,9 +45,11 @@ CBPeripheralManagerDelegate
             BTDevices.append("-- Devices display here --")
             BTPicker.reloadAllComponents()
         }
+        textDiagnostics.text += "Loaded...\n"
     }
     
     func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
+        textDiagnostics.text += "centralManager()...\n"
         if (peripheral.name != nil){
             BTDevices.append(peripheral.name!)
         }
@@ -62,6 +66,7 @@ CBPeripheralManagerDelegate
     @IBAction func ScanForBluetooth(sender: UIButton){
         BTDevices.removeAll()
         peripherals.removeAll()
+        textDiagnostics.text += "ScanForBluetooth()...\n"
         if (centralManager?.state == .poweredOn){
             self.centralManager?.scanForPeripherals(withServices: nil, options: nil)
         }
@@ -81,15 +86,15 @@ CBPeripheralManagerDelegate
     @IBAction func OpenCloseDoor(sender: UIButton){
         // This function sends data over bluetooth to the connected .
 
-        if (peripherals.count <= 0){
-            let alertVC = UIAlertController(title: "No BT Devices", message: "Couldn't connect.  Please try again.", preferredStyle: UIAlertController.Style.alert)
-            let action = UIAlertAction(title: "ok", style: UIAlertAction.Style.default, handler: { (action: UIAlertAction) -> Void in
-                self.dismiss(animated: true, completion: nil)
-            })
-            alertVC.addAction(action)
-            self.present(alertVC, animated: true, completion: nil)
-            return;
-        }
+//        if (peripherals.count <= 0){
+//            let alertVC = UIAlertController(title: "No BT Devices", message: "Couldn't connect.  Please try again.", preferredStyle: UIAlertController.Style.alert)
+//            let action = UIAlertAction(title: "ok", style: UIAlertAction.Style.default, handler: { (action: UIAlertAction) -> Void in
+//                self.dismiss(animated: true, completion: nil)
+//            })
+//            alertVC.addAction(action)
+//            self.present(alertVC, animated: true, completion: nil)
+//            return;
+//        }
         let currentSelectedBT = BTPicker.selectedRow(inComponent: 0)
         currentPeripheral = peripherals[currentSelectedBT]
         centralManager?.connect(currentPeripheral, options: nil)
