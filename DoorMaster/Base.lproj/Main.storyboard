@@ -16,21 +16,11 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <pickerView contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="QSJ-bg-foC">
-                                <rect key="frame" x="0.0" y="84" width="414" height="216"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                            <pickerView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="QSJ-bg-foC">
+                                <rect key="frame" x="0.0" y="84" width="414" height="329"/>
                             </pickerView>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="PWR-Vz-56P">
-                                <rect key="frame" x="135" y="308" width="105" height="30"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Scan Bluetooth"/>
-                                <connections>
-                                    <action selector="ScanForBluetoothWithSender:" destination="BYZ-38-t0r" eventType="touchUpInside" id="JcL-AE-n5Q"/>
-                                </connections>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="CX2-NB-18K">
-                                <rect key="frame" x="67" y="386" width="253" height="53"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="CX2-NB-18K">
+                                <rect key="frame" x="80.5" y="483" width="253" height="53"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="34"/>
                                 <state key="normal" title="Open/Close Door">
                                     <color key="titleColor" red="1" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -39,20 +29,53 @@
                                     <action selector="OpenCloseDoorWithSender:" destination="BYZ-38-t0r" eventType="touchUpInside" id="k3h-EE-x5Z"/>
                                 </connections>
                             </button>
-                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="wjK-qR-93w">
-                                <rect key="frame" x="67" y="458" width="253" height="351"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="wjK-qR-93w">
+                                <rect key="frame" x="15" y="556" width="384" height="291"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <color key="textColor" systemColor="labelColor"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                             </textView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="OjF-0j-udK" userLabel="Current Device">
+                                <rect key="frame" x="20" y="437.5" width="42" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="PWR-Vz-56P">
+                                <rect key="frame" x="251" y="433" width="143" height="30"/>
+                                <state key="normal" title="Scan Bluetooth"/>
+                                <connections>
+                                    <action selector="ScanForBluetoothWithSender:" destination="BYZ-38-t0r" eventType="touchUpInside" id="JcL-AE-n5Q"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="wjK-qR-93w" firstAttribute="centerX" secondItem="CX2-NB-18K" secondAttribute="centerX" id="5un-8g-JIZ"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="wjK-qR-93w" secondAttribute="trailing" constant="15" id="HrM-f4-9XX"/>
+                            <constraint firstItem="PWR-Vz-56P" firstAttribute="leading" secondItem="OjF-0j-udK" secondAttribute="trailing" constant="20" id="OxT-R7-61a"/>
+                            <constraint firstItem="CX2-NB-18K" firstAttribute="top" secondItem="PWR-Vz-56P" secondAttribute="bottom" constant="20" id="QWd-w3-va6"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="wjK-qR-93w" secondAttribute="bottom" constant="15" id="Z1f-eN-mFm"/>
+                            <constraint firstItem="OjF-0j-udK" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="20" id="ZpS-Nk-BUA"/>
+                            <constraint firstItem="OjF-0j-udK" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="b7d-ti-Uq1"/>
+                            <constraint firstItem="PWR-Vz-56P" firstAttribute="top" secondItem="QSJ-bg-foC" secondAttribute="bottom" constant="20" id="cCX-mF-jt1"/>
+                            <constraint firstItem="wjK-qR-93w" firstAttribute="centerX" secondItem="CX2-NB-18K" secondAttribute="centerX" id="cez-Sl-wDj"/>
+                            <constraint firstItem="CX2-NB-18K" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="fIs-Dl-Hdr"/>
+                            <constraint firstItem="PWR-Vz-56P" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="gHv-1o-gVN"/>
+                            <constraint firstItem="wjK-qR-93w" firstAttribute="top" secondItem="CX2-NB-18K" secondAttribute="bottom" constant="20" id="hg0-bE-lUJ"/>
+                            <constraint firstItem="QSJ-bg-foC" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="liT-LE-b7s"/>
+                            <constraint firstItem="QSJ-bg-foC" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="40" id="m1g-lT-0HX"/>
+                            <constraint firstItem="PWR-Vz-56P" firstAttribute="leading" secondItem="OjF-0j-udK" secondAttribute="trailing" constant="20" id="mjW-aP-4l2"/>
+                            <constraint firstItem="QSJ-bg-foC" firstAttribute="centerX" secondItem="wjK-qR-93w" secondAttribute="centerX" id="njI-Ai-JVI"/>
+                            <constraint firstItem="wjK-qR-93w" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="15" id="oRY-pB-reb"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="PWR-Vz-56P" secondAttribute="trailing" constant="20" id="w5s-Qz-NvB"/>
+                        </constraints>
                     </view>
                     <connections>
                         <outlet property="BTPicker" destination="QSJ-bg-foC" id="Qqq-2H-Rui"/>
+                        <outlet property="currentDeviceName" destination="OjF-0j-udK" id="k2v-N7-UB1"/>
                         <outlet property="textDiagnostics" destination="wjK-qR-93w" id="d3W-MC-Ihs"/>
                         <outlet property="view" destination="wjK-qR-93w" id="qEC-eu-x04"/>
                     </connections>

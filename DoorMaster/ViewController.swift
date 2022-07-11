@@ -25,10 +25,12 @@ CBPeripheralManagerDelegate
     var currentPeripheral : CBPeripheral!
     
     @IBOutlet var textDiagnostics : UITextView!
+    @IBOutlet var currentDeviceName : UILabel!
     
     @IBOutlet weak var BTPicker: UIPickerView!
 
     func centralManagerDidUpdateState(_ central: CBCentralManager) {
+        textDiagnostics.text += "* centralMgr DidUpdateState() *\n"
         peripherals.removeAll()
         BTDevices.removeAll()
         if (central.state == .poweredOn){
@@ -57,6 +59,7 @@ CBPeripheralManagerDelegate
             // BTDevices.append("no device name")
         }
         peripherals.append(peripheral)
+        textDiagnostics.text += "peripheral added: \(peripheral.name)\n"
         BTPicker.reloadAllComponents()
         setUserBtDevice()
         
@@ -93,13 +96,13 @@ CBPeripheralManagerDelegate
     }
     
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
-        print("*****************************")
-        print("Connection complete")
-        print("Peripheral info: \(currentPeripheral)")
+        textDiagnostics.text += "************************\n"
+        textDiagnostics.text += "Connection complete"
+        textDiagnostics.text += "Peripheral info: \(currentPeripheral)\n"
         
         //Stop Scan- We don't need to scan once we've connected to a peripheral. We got what we came for.
         centralManager?.stopScan()
-        print("Scan Stopped")
+        textDiagnostics.text += "Scan Stopped\n"
         
         //Erase data that we might have
         data.length = 0
@@ -111,10 +114,10 @@ CBPeripheralManagerDelegate
     }
     
     func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
-        print("*******************************************************")
+        textDiagnostics.text += "*********************************\n"
         
         if ((error) != nil) {
-            print("Error discovering services: \(error!.localizedDescription)")
+            textDiagnostics.text += "Error discovering services: \(error!.localizedDescription)\n"
             return
         }
         
@@ -126,19 +129,19 @@ CBPeripheralManagerDelegate
             
             peripheral.discoverCharacteristics(nil, for: service)
         }
-        print("Discovered Services: \(services)")
+        textDiagnostics.text += "Discovered Services:\(services)\n"
         
     }
     
     func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
         
         if let error = error {
-            print("Error discovering service characteristics: \(error.localizedDescription)")
+            textDiagnostics.text += "Error discovering service characteristics: \(error.localizedDescription)\n"
         }
         
         service.characteristics?.forEach({ characteristic in
             if let descriptors = characteristic.descriptors {
-                print("DESCRIPTORS \(descriptors)")
+                textDiagnostics.text += "DESCRIPTORS \(descriptors)\n"
             }
             let outString = "y"
             var data = outString.data(using: String.Encoding.ascii)
@@ -147,7 +150,7 @@ CBPeripheralManagerDelegate
                 if(characteristic.uuid.uuidString == "FFE1")
                 {
                     if (peripheral.state.rawValue == 2){
-                    print("sending data")
+                        textDiagnostics.text += "SENDING data\n"
                     peripheral.writeValue(data ?? Data() ,
                                           for: characteristic,
                                           type: CBCharacteristicWriteType.withoutResponse)
@@ -168,8 +171,8 @@ CBPeripheralManagerDelegate
                     
                 }
             }
-            print("CHARACTERISTIC : \(characteristic.uuid.uuidString)")
-            print(characteristic.properties)
+            textDiagnostics.text += "CHARACTERISTIC : \(characteristic.uuid.uuidString)\n"
+            textDiagnostics.text += "\(characteristic.properties)\n"
             
         })
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
@@ -197,9 +200,7 @@ CBPeripheralManagerDelegate
     }
 
     func disconnectFromDevice (_ peripheral: CBPeripheral ) {
-        if peripheral != nil {
-            centralManager?.cancelPeripheralConnection(peripheral)
-        }
+        centralManager?.cancelPeripheralConnection(peripheral)
     }
    
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
@@ -221,10 +222,11 @@ CBPeripheralManagerDelegate
         self.BTPicker.delegate = self
         self.BTPicker.dataSource = self
         BTPicker.reloadAllComponents()
-        
+            textDiagnostics.text += "Loading picker...\n"
         //userDefs.removeObject(forKey: "btdevice")  // use to remove value you added
         currentBTDevice = userDefs.string(forKey:"btdevice")
         if (currentBTDevice != nil){
+            currentDeviceName.text = currentBTDevice;
             print (currentBTDevice!)
         }
             
@@ -237,7 +239,7 @@ CBPeripheralManagerDelegate
     
     func setUserBtDevice(){
         let itemIndex = getUserSavedBTDevice();
-        
+        //textDiagnostics.text += "got userSavedDevice : \(itemIndex)\n"
         BTPicker.selectRow(itemIndex, inComponent: 0, animated: true)
         
     }
