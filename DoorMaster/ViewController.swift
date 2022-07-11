@@ -53,13 +53,15 @@ CBPeripheralManagerDelegate
         textDiagnostics.text += "centralManager()...\n"
         if (peripheral.name != nil){
             BTDevices.append(peripheral.name!)
+            peripherals.append(peripheral)
+            textDiagnostics.text += "peripheral added: \(peripheral.name)\n"
         }
         else{
             // 2022-07-10 No longer show devices with no name
             // BTDevices.append("no device name")
         }
-        peripherals.append(peripheral)
-        textDiagnostics.text += "peripheral added: \(peripheral.name)\n"
+       
+        
         BTPicker.reloadAllComponents()
         setUserBtDevice()
         
@@ -88,7 +90,7 @@ CBPeripheralManagerDelegate
     @IBAction func OpenCloseDoor(sender: UIButton){
         let currentSelectedBT = BTPicker.selectedRow(inComponent: 0)
         textDiagnostics.text += currentSelectedBT.description + "\n"
-        if (peripherals.count != 0){
+        if (peripherals.count > 0){
             currentPeripheral = peripherals[currentSelectedBT]
             centralManager?.connect(currentPeripheral, options: nil)
         }
@@ -259,6 +261,7 @@ CBPeripheralManagerDelegate
         userDefs.set(BTDevices[row], forKey:"btdevice")
         userDefs.synchronize()
         print(BTDevices[row])
+        currentDeviceName.text = BTDevices[row]
         
     }
 
