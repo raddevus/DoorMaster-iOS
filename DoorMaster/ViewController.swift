@@ -31,8 +31,7 @@ CBPeripheralManagerDelegate
 
     func centralManagerDidUpdateState(_ central: CBCentralManager) {
         textDiagnostics.text += "* centralMgr DidUpdateState() *\n"
-        peripherals.removeAll()
-        BTDevices.removeAll()
+  
         if (central.state == .poweredOn){
             self.centralManager?.scanForPeripherals(withServices: nil, options: nil)
         }
@@ -52,13 +51,20 @@ CBPeripheralManagerDelegate
     func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
         textDiagnostics.text += "centralManager()...\n"
         if (peripheral.name != nil){
-            BTDevices.append(peripheral.name!)
-            peripherals.append(peripheral)
-            textDiagnostics.text += "peripheral added: \(peripheral.name)\n"
+            if (!BTDevices.contains(peripheral.name!)){
+                BTDevices.append(peripheral.name!)
+            }
+            if (!peripherals.contains(peripheral)){
+                
+                peripherals.append(peripheral)
+                textDiagnostics.text += "peripheral added: \(peripheral.name!)\n"
+            }
+            
         }
         else{
             // 2022-07-10 No longer show devices with no name
             // BTDevices.append("no device name")
+            textDiagnostics.text += "\(peripheral.identifier)"
         }
        
         
@@ -68,8 +74,6 @@ CBPeripheralManagerDelegate
     }
     
     @IBAction func ScanForBluetooth(sender: UIButton){
-        BTDevices.removeAll()
-        peripherals.removeAll()
         textDiagnostics.text += "ScanForBluetooth()...\n"
         if (centralManager?.state == .poweredOn){
             self.centralManager?.scanForPeripherals(withServices: nil, options: nil)
@@ -90,11 +94,27 @@ CBPeripheralManagerDelegate
     @IBAction func OpenCloseDoor(sender: UIButton){
         let currentSelectedBT = BTPicker.selectedRow(inComponent: 0)
         textDiagnostics.text += currentSelectedBT.description + "\n"
-        if (peripherals.count > 0){
-            currentPeripheral = peripherals[currentSelectedBT]
-            centralManager?.connect(currentPeripheral, options: nil)
-        }
+        textDiagnostics.text += "peripherals.count : \(peripherals.count)\n"
         
+        currentPeripheral = getCurrentPeripheral()
+        if (currentPeripheral == nil){
+            textDiagnostics.text += "### Couldn't get BT Device! ###\n"
+            return;
+        }
+        textDiagnostics.text += "CONNECT\n"
+        centralManager?.connect(currentPeripheral, options: nil)
+        textDiagnostics.text += "called it!\n"
+    }
+    
+    func getCurrentPeripheral() -> CBPeripheral!{
+        for btItem in peripherals{
+            textDiagnostics.text += "XXX btItem \(btItem.name!) currentDeviceName.text \(currentDeviceName.text!) XXX\n"
+            if (btItem.name! == currentDeviceName.text!){
+                textDiagnostics.text += "ZZZ got one!!!  ZZZ\n"
+                return btItem;
+            }
+        }
+        return nil;
     }
     
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
@@ -113,6 +133,11 @@ CBPeripheralManagerDelegate
         peripheral.delegate = self
         //Only look for services that matches transmit uuid
         peripheral.discoverServices(nil)
+    }
+    
+    func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
+        textDiagnostics.text += "\(central.description) -- \(error?.localizedDescription)"
+        
     }
     
     func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
@@ -153,7 +178,7 @@ CBPeripheralManagerDelegate
                 {
                     if (peripheral.state.rawValue == 2){
                         textDiagnostics.text += "SENDING data\n"
-                    peripheral.writeValue(data ?? Data() ,
+                    peripheral.writeValue(data ?? Data(),
                                           for: characteristic,
                                           type: CBCharacteristicWriteType.withoutResponse)
                         let noString = "n"
@@ -171,6 +196,15 @@ CBPeripheralManagerDelegate
                     }
                     
                     
+                }
+                else if (characteristic.uuid.uuidString == "2A19") {
+                    textDiagnostics.text += "writing data...\n"
+                    peripheral.writeValue(data ?? Data() ,
+                                          for: characteristic,
+                                          type: CBCharacteristicWriteType.withoutResponse)
+                }
+                else{
+                    textDiagnostics.text += "uuid :  \(characteristic.uuid.uuidString)\n"
                 }
             }
             textDiagnostics.text += "CHARACTERISTIC : \(characteristic.uuid.uuidString)\n"
@@ -200,6 +234,12 @@ CBPeripheralManagerDelegate
         })
         
     }
+    
+    func peripheral(_ peripheral: CBPeripheral,
+                    didDiscoverIncludedServicesFor service:CBService,
+                    error: Error?){
+        textDiagnostics.text += "Peripheral error: \(error?.localizedDescription)\n"
+    }
 
     func disconnectFromDevice (_ peripheral: CBPeripheral ) {
         centralManager?.cancelPeripheralConnection(peripheral)
@@ -207,7 +247,6 @@ CBPeripheralManagerDelegate
    
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
         return 1
-        
     }
     
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
@@ -218,7 +257,7 @@ CBPeripheralManagerDelegate
         super.viewDidLoad()
         // viewDidLoad() runs BEFORE CentralManager initialization
         //Initialize CoreBluetooth Central Manager
-        centralManager = CBCentralManager(delegate: self, queue: DispatchQueue.main)
+            self.centralManager = CBCentralManager(delegate: self, queue: DispatchQueue.main)
         
         // Connect data:
         self.BTPicker.delegate = self
