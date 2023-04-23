@@ -12,6 +12,9 @@ import CoreBluetooth
 class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSource,CBCentralManagerDelegate, CBPeripheralDelegate,
 CBPeripheralManagerDelegate
 {
+    
+    
+    
     func peripheralManagerDidUpdateState(_ peripheral: CBPeripheralManager) {
         
     }
@@ -28,7 +31,7 @@ CBPeripheralManagerDelegate
     @IBOutlet var currentDeviceName : UILabel!
     
     @IBOutlet weak var BTPicker: UIPickerView!
-
+   
     func centralManagerDidUpdateState(_ central: CBCentralManager) {
         textDiagnostics.text += "* centralMgr DidUpdateState() *\n"
   
@@ -120,7 +123,7 @@ CBPeripheralManagerDelegate
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
         textDiagnostics.text += "************************\n"
         textDiagnostics.text += "Connection complete"
-        textDiagnostics.text += "Peripheral info: \(currentPeripheral)\n"
+        textDiagnostics.text += "Peripheral info: \(currentPeripheral!)\n"
         
         //Stop Scan- We don't need to scan once we've connected to a peripheral. We got what we came for.
         centralManager?.stopScan()
@@ -136,7 +139,7 @@ CBPeripheralManagerDelegate
     }
     
     func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
-        textDiagnostics.text += "\(central.description) -- \(error?.localizedDescription)"
+        textDiagnostics.text += "\(central.description) -- \(error!.localizedDescription)"
         
     }
     
@@ -238,7 +241,7 @@ CBPeripheralManagerDelegate
     func peripheral(_ peripheral: CBPeripheral,
                     didDiscoverIncludedServicesFor service:CBService,
                     error: Error?){
-        textDiagnostics.text += "Peripheral error: \(error?.localizedDescription)\n"
+        textDiagnostics.text += "Peripheral error: \(error!.localizedDescription)\n"
     }
 
     func disconnectFromDevice (_ peripheral: CBPeripheral ) {
@@ -272,6 +275,7 @@ CBPeripheralManagerDelegate
         }
             
         setUserBtDevice()
+        
     }
     
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
